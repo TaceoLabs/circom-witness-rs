@@ -14,6 +14,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::graph::Node;
 
+pub use ruint;
+
 pub type BlackBoxFunction = Arc<dyn Fn(&[Fr]) -> Fr + Send + Sync + 'static>;
 
 pub const M: U256 =
