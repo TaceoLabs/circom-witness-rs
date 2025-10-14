@@ -4,6 +4,7 @@ use crate::{BlackBoxFunction, M};
 use ark_bn254::Fr;
 use ark_ff::PrimeField;
 use eyre::bail;
+use num_bigint::BigUint;
 use rand::Rng;
 use ruint::aliases::U256;
 use ruint::uint;
@@ -49,6 +50,7 @@ pub enum Operation {
     Neg,
     Inv,
     Div,
+    Mod,
     Pow,
     Land,
     IDiv,
@@ -101,6 +103,7 @@ impl Operation {
             Neg => (M - a) % M,
             Inv => a.inv_mod(M).unwrap(),
             Div => a.mul_mod(b.inv_mod(M).unwrap(), M),
+            Mod => a.reduce_mod(b),
             Pow => a.pow_mod(b, M),
             IDiv => a / b,
             _ => unimplemented!("operator {:?} not implemented", self),
@@ -116,6 +119,11 @@ impl Operation {
             Eq => (a == b).into(),
             Neg => -a,
             Div => a / b,
+            Mod => {
+                let a: BigUint = a.into();
+                let b: BigUint = b.into();
+                Fr::from(a % b)
+            }
             _ => unimplemented!("operator {:?} not implemented for Montgomery", self),
         }
     }
@@ -404,7 +412,8 @@ pub fn montgomery_form(nodes: &mut [Node]) {
             Constant(c) => *node = MontConstant(Fr::new((*c).into())),
             MontConstant(..) => (),
             Input(..) => (),
-            Op(Add | Sub | Mul | Neg | Div, ..) => (),
+            Op(Add | Sub | Mul | Neg | Div | Mod | IDiv, ..) => (),
+
             Op(op, ..) => {
                 println!("Operator {:?} not implemented for Montgomery form", op);
                 unimplemented!("Operators Montgomery form")
