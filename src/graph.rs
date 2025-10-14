@@ -119,6 +119,11 @@ impl Operation {
             Eq => (a == b).into(),
             Neg => -a,
             Div => a / b,
+            IDiv => {
+                let a: BigUint = a.into();
+                let b: BigUint = b.into();
+                Fr::from(a / b)
+            }
             Mod => {
                 let a: BigUint = a.into();
                 let b: BigUint = b.into();
