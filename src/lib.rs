@@ -26,6 +26,7 @@ pub struct HashSignalInfo {
     pub signalsize: u64,
 }
 
+#[derive(Clone)]
 pub struct Graph {
     pub nodes: Vec<Node>,
     pub signals: Vec<usize>,
